@@ -30,7 +30,7 @@ FijkPanelWidgetBuilder fijkPanel2Builder(
     final bool snapShot = false,
     final VoidCallback? onBack}) {
   return (FijkPlayer player, FijkData data, BuildContext context, Size viewSize,
-      Rect texturePos) {
+      Rect texturePos, VideoControlItemsVisisbilityChanged? onChanged) {
     return _FijkPanel2(
       key: key,
       player: player,
@@ -42,6 +42,7 @@ FijkPanelWidgetBuilder fijkPanel2Builder(
       doubleTap: doubleTap,
       snapShot: snapShot,
       hideDuration: duration,
+      onChanged: onChanged,
     );
   };
 }
@@ -56,6 +57,7 @@ class _FijkPanel2 extends StatefulWidget {
   final bool doubleTap;
   final bool snapShot;
   final int hideDuration;
+  final VideoControlItemsVisisbilityChanged? onChanged;
 
   const _FijkPanel2(
       {Key? key,
@@ -67,6 +69,7 @@ class _FijkPanel2 extends StatefulWidget {
       this.hideDuration = 4000,
       this.doubleTap = false,
       this.snapShot = false,
+      required this.onChanged,
       required this.texPos})
       : assert(hideDuration > 0 && hideDuration < 10000),
         super(key: key);
@@ -199,6 +202,9 @@ class __FijkPanel2State extends State<_FijkPanel2> {
     _hideTimer = Timer(Duration(milliseconds: widget.hideDuration), () {
       setState(() {
         _hideStuff = true;
+        if (widget.onChanged != null) {
+          widget.onChanged!(_hideStuff);
+        }
       });
     });
   }
@@ -209,6 +215,9 @@ class __FijkPanel2State extends State<_FijkPanel2> {
     }
     setState(() {
       _hideStuff = !_hideStuff;
+      if (widget.onChanged != null) {
+        widget.onChanged!(_hideStuff);
+      }
     });
   }
 

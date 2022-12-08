@@ -23,13 +23,20 @@
 part of fijkplayer;
 
 /// Default builder generate default [FijkPanel] UI
-Widget defaultFijkPanelBuilder(FijkPlayer player, FijkData data,
-    BuildContext context, Size viewSize, Rect texturePos) {
+Widget defaultFijkPanelBuilder(
+    FijkPlayer player,
+    FijkData data,
+    BuildContext context,
+    Size viewSize,
+    Rect texturePos,
+    VideoControlItemsVisisbilityChanged? onChanged) {
   return _DefaultFijkPanel(
-      player: player,
-      buildContext: context,
-      viewSize: viewSize,
-      texturePos: texturePos);
+    player: player,
+    buildContext: context,
+    viewSize: viewSize,
+    texturePos: texturePos,
+    onChanged: onChanged,
+  );
 }
 
 /// Default Panel Widget
@@ -38,12 +45,14 @@ class _DefaultFijkPanel extends StatefulWidget {
   final BuildContext buildContext;
   final Size viewSize;
   final Rect texturePos;
+  final VideoControlItemsVisisbilityChanged? onChanged;
 
   const _DefaultFijkPanel({
     required this.player,
     required this.buildContext,
     required this.viewSize,
     required this.texturePos,
+    required this.onChanged,
   });
 
   @override
@@ -165,6 +174,9 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
     _hideTimer = Timer(const Duration(seconds: 3), () {
       setState(() {
         _hideStuff = true;
+        if (widget.onChanged != null) {
+          widget.onChanged!(_hideStuff);
+        }
       });
     });
   }
@@ -175,6 +187,9 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
     }
     setState(() {
       _hideStuff = !_hideStuff;
+      if (widget.onChanged != null) {
+        widget.onChanged!(_hideStuff);
+      }
     });
   }
 

@@ -30,8 +30,15 @@ part of fijkplayer;
 /// The return widget is placed as one of [Stack]'s children.
 /// If change FijkView between normal mode and full screen mode, the panel would
 /// be rebuild. [data] can be used to pass value from different panel.
-typedef FijkPanelWidgetBuilder = Widget Function(FijkPlayer player,
-    FijkData data, BuildContext context, Size viewSize, Rect texturePos);
+typedef FijkPanelWidgetBuilder = Widget Function(
+    FijkPlayer player,
+    FijkData data,
+    BuildContext context,
+    Size viewSize,
+    Rect texturePos,
+    VideoControlItemsVisisbilityChanged? onChanged);
+
+typedef VideoControlItemsVisisbilityChanged = Widget Function(bool);
 
 /// How a video should be inscribed into [FijkView].
 ///
@@ -170,6 +177,8 @@ class FijkView extends StatefulWidget {
   /// But you can still call [FijkPlayer.enterFullScreen] and [FijkPlayer.exitFullScreen] and make your own full screen pages.
   final bool fs;
 
+  VideoControlItemsVisisbilityChanged? onChanged;
+
   @override
   createState() => _FijkViewState();
 }
@@ -273,6 +282,7 @@ class _FijkViewState extends State<FijkView> {
             fullScreen: true,
             cover: widget.cover,
             data: _fijkData,
+            onChanged: widget.onChanged,
           ),
         );
       },
@@ -335,6 +345,7 @@ class _FijkViewState extends State<FijkView> {
               fullScreen: false,
               cover: widget.cover,
               data: _fijkData,
+              onChanged: widget.onChanged,
             ),
     );
   }
@@ -346,12 +357,14 @@ class _InnerFijkView extends StatefulWidget {
     required this.fullScreen,
     required this.cover,
     required this.data,
+    required this.onChanged,
   });
 
   final _FijkViewState fijkViewState;
   final bool fullScreen;
   final ImageProvider? cover;
   final FijkData data;
+  final VideoControlItemsVisisbilityChanged? onChanged;
 
   @override
   __InnerFijkViewState createState() => __InnerFijkViewState();
@@ -563,7 +576,8 @@ class __InnerFijkViewState extends State<_InnerFijkView> {
       }
 
       if (_panelBuilder != null) {
-        ws.add(_panelBuilder!(_player, data, ctx, constraints.biggest, pos));
+        ws.add(_panelBuilder!(
+            _player, data, ctx, constraints.biggest, pos, widget.onChanged));
       }
       return Stack(
         children: ws as List<Widget>,
